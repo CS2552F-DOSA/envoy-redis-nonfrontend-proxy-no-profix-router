@@ -75,22 +75,6 @@ services:
         aliases:
           - frontend-client
 
-  frontend-client-proxy:
-    build:
-      context: .
-      dockerfile: Dockerfile-frontenvoy
-    volumes:
-      - ./front-envoy.yaml:/etc/front-envoy.yaml
-    networks:
-      envoymesh:
-        aliases:
-          - frontend-client-proxy
-    expose:
-      - "9911"
-      - "8001"
-    ports:
-      - "9911:9911"
-      - "8001:8001"
 
 networks:
   envoymesh: {}
