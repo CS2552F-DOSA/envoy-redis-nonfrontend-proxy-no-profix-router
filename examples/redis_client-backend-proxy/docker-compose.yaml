@@ -1,0 +1,96 @@
+version: "3.7"
+services:
+
+  redis:
+    build:
+      context: .
+      dockerfile: Dockerfile-redis
+    networks:
+      envoymesh:
+        aliases:
+          - redis_server
+    expose:
+      - "6379"
+    # for debuging
+    # ports:
+    #   - "6379:6379"
+  
+  redis_test:
+    build:
+      context: .
+      dockerfile: Dockerfile-redis
+    networks:
+      envoymesh:
+        aliases:
+          - redis_test-server
+    expose:
+      - "6378"
+    # for debuging
+    # ports:
+    #   - "6378:6379"
+
+  redis-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile-backenvoy
+    volumes:
+      - ./redis-envoy.yaml:/etc/envoy.yaml
+    networks:
+      envoymesh:
+        aliases:
+          - redis-proxy
+    expose:
+      - "1999"
+      - "8002"
+    ports:
+      - "1999:1999"
+      - "8002:8002"
+
+  redis-test-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile-backenvoy
+    volumes:
+      - ./redis-envoy.yaml:/etc/envoy.yaml
+    networks:
+      envoymesh:
+        aliases:
+          - redis-test-proxy
+    expose:
+      - "1999"
+      - "8002"
+    ports:
+      - "1998:1999"
+      - "8003:8002"
+  
+
+  frontend-client:
+    build:
+      context: .
+      dockerfile: Dockerfile-client
+    environment:
+      - CLIENT_PROXY=http://frontend-client-proxy:9911
+    networks:
+      envoymesh:
+        aliases:
+          - frontend-client
+
+  frontend-client-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile-frontenvoy
+    volumes:
+      - ./front-envoy.yaml:/etc/front-envoy.yaml
+    networks:
+      envoymesh:
+        aliases:
+          - frontend-client-proxy
+    expose:
+      - "9911"
+      - "8001"
+    ports:
+      - "9911:9911"
+      - "8001:8001"
+
+networks:
+  envoymesh: {}

@@ -1,0 +1,5 @@
+requests>=2.22.0
+grpcio
+grpcio-tools
+protobuf==3.10.0
+redis
